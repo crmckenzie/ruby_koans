@@ -31,6 +31,30 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 
 def score(dice)
   # You need to write this method
+  score = 0
+
+  hash = Hash.new(0)
+  dice.each { |element|
+    hash[element] += 1
+  }
+
+
+  block = lambda { |size, bonus_value, single_card_value|
+      if size >= 3
+        score += bonus_value
+        size -= 3
+      end
+    score += single_card_value * size
+  }
+
+  block.call(hash[1].size, 1000, 100)
+  block.call(hash[2].size, 0, 0)
+  block.call(hash[3].size, 0, 0)
+  block.call(hash[4].size, 0, 0)
+  block.call(hash[5].size, 500, 550)
+
+
+  return score
 end
 
 class AboutScoringProject < Neo::Koan
