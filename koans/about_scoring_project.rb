@@ -33,26 +33,31 @@ def score(dice)
   # You need to write this method
   score = 0
 
-  hash = Hash.new(0)
+  default_multiplier = lambda { |value|
+    return value * 100
+  }
+  multipliers = Hash.new(default_multiplier)
+  multipliers[1] = lambda {| value | return 1000 }
+  multipliers[5] = lambda {| value | return 500  }
+
+  face_values = [nil, 100, 0, 0, 0, 50, 0]
+
+  faces = Hash.new(0)
   dice.each { |element|
-    hash[element] += 1
+    faces[element] += 1
   }
 
-
-  block = lambda { |size, bonus_value, single_card_value|
-      if size >= 3
-        score += bonus_value
-        size -= 3
+  accumulate = lambda { |die_value|
+    count = faces[die_value]
+      if count >= 3
+        multiplier = multipliers[die_value]
+        score += multiplier.call(die_value)
+        count -= 3
       end
-    score += single_card_value * size
+    score += face_values[die_value] * count
   }
 
-  block.call(hash[1].size, 1000, 100)
-  block.call(hash[2].size, 0, 0)
-  block.call(hash[3].size, 0, 0)
-  block.call(hash[4].size, 0, 0)
-  block.call(hash[5].size, 500, 550)
-
+  dice.uniq.each {|die| accumulate.call(die)}
 
   return score
 end
